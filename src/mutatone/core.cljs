@@ -2,7 +2,8 @@
   (:require [clojure.browser.repl :as repl]
             [mutatone.theory :as t]
             [mutatone.audio :as a]
-            [hum.core :as hum]))
+            [hum.core :as hum]
+            [mutatone.dom :as dom]))
 
 (def ctx (atom nil))
 (def osc (atom nil))
@@ -28,6 +29,30 @@
 
 (defn panic []
   (a/kill-notes @osc @gain))
+
+(def melodies
+  (atom
+    [{:intervals [0 0 1 1 3 2 -1 -1 0 0 1 1 3 2 -1 -1]
+      :scale "phrygian"
+      :root "b"}
+
+     {:intervals [0 0 -1 -1 -2 -2 -3 -3 0 0 2 2 1 1 1 1]
+      :scale "minor pentatonic"
+      :root "c"}
+
+     {:intervals [0 1 2 1 4 5 3 0 2 2 -1 -2 -1 -1 0 0 0 0 0 0]
+      :scale "major"
+      :root "d#"}]))
+
+(defn init-page []
+  (dom/render-melodies @melodies))
+
+(defn on-load [cb]
+  (if (#{"complete" "loaded" "interactive"} (.-readyState js/document))
+    (.setImmediate js/window cb)
+    (.addEventListener js/document "DOMContentLoaded" init-page false)))
+
+(on-load init-page)
 
 (repl/connect "http://localhost:9000/repl")
 

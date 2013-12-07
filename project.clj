@@ -4,7 +4,8 @@
 
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]
-                 [hum "0.2.4"]]
+                 [hum "0.2.4"]
+                 [prismatic/dommy "0.1.2"]]
 
   :plugins [[lein-cljsbuild "1.0.0"]]
 
