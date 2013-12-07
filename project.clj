@@ -1,4 +1,4 @@
-(defproject thing1 "0.1.0-SNAPSHOT"
+(defproject mutatone "0.1.0-SNAPSHOT"
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
 
@@ -11,10 +11,10 @@
   :source-paths ["src"]
 
   :cljsbuild { 
-    :builds [{:id "thing1"
+    :builds [{:id "mutatone"
               :source-paths ["src"]
               :compiler {
-                :output-to "thing1.js"
+                :output-to "mutatone.js"
                 :output-dir "out"
                 :optimizations :none
                 :source-map true}}]})

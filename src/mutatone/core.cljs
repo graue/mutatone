@@ -1,4 +1,4 @@
-(ns thing1.core
+(ns mutatone.core
   (:require [clojure.browser.repl :as repl]
             [clojure.set :as cset]
             [hum.core :as hum]))
