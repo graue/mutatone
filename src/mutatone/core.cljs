@@ -94,7 +94,7 @@
   named `scale` starting on `note` in octave `octave`."
   [intervals scale note & [octave]]
   (let [octave (or octave 4)
-        octave-offset (* 12 octave)
+        octave-offset (* 12 (inc octave))
         note-offset (notes (.toLowerCase note))
         chromatic-intervals (dia->chrom intervals scale)]
     (map (partial + octave-offset note-offset) chromatic-intervals)))
