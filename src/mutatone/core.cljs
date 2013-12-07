@@ -3,13 +3,7 @@
             [clojure.set :as cset]
             [hum.core :as hum]))
 
-;;; Work around bug in hum/note-on.
-(defn my-note-on [ctx output osc freq & time]
-  (let [time (get time 0 (hum/curr-time ctx))]
-    (.setValueAtTime (.-frequency osc) freq time)
-    (.linearRampToValueAtTime (.-gain output) 1.0 (+ time 0.1))))
-
-;;;; utilities
+;;;; Utilities
 
 (defn midi->hz
   "Convert a MIDI note number to its frequency in Hz."
@@ -40,19 +34,18 @@
    "minor pentatonic" [3 2 2 3 2]})
 
 (def notes
-  {"c"  0; ,  "b#" 0
-   "c#" 1; ,  "db" 1
-   "d"  2; 
-   "d#" 3; ,  "eb" 3
-   "e"  4; ,  "fb" 4
-   "f"  5; 
-   "f#" 6; ,  "gb" 6
-   "g"  7; 
-   "g#" 8; ,  "ab" 8
-   "a"  9; 
-   "a#" 10;, "bb" 10
-   "b"  11;, "cb" 11
-   })
+  {"C"  0
+   "C#" 1
+   "D"  2
+   "D#" 3
+   "E"  4
+   "F"  5
+   "F#" 6
+   "G"  7
+   "G#" 8
+   "A"  9
+   "A#" 10
+   "B"  11})
 
 (def notenum->name
   (cset/map-invert notes))
@@ -95,7 +88,7 @@
   [intervals scale note & [octave]]
   (let [octave (or octave 4)
         octave-offset (* 12 (inc octave))
-        note-offset (notes (.toLowerCase note))
+        note-offset (notes (.toUpperCase note))
         chromatic-intervals (dia->chrom intervals scale)]
     (map (partial + octave-offset note-offset) chromatic-intervals)))
 
