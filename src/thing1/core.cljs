@@ -79,13 +79,13 @@
         scale (cycle raw-scale)
         neg-scale (cycle (reverse raw-scale))]  ; For negative intervals.
     (if-not (coll? intervals)
-      ; "intervals" is actually just one value.
-      (if (neg? intervals)
+      (if (pos? intervals)
+        (sum (take intervals scale))
+
         ; Negative case, e.g. for -2, sum the *last* two intervals in the
         ; scale definition and negate the result.
-        (- (sum (take (- intervals) neg-scale)))
-        ; Positive case.
-        (sum (take intervals scale)))
+        (- (sum (take (- intervals) neg-scale))))
+
       ; If passed a collection, map this function across each element.
       (map #(dia->chrom % scale-name) intervals))))
 
