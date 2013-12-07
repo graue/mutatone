@@ -1,0 +1,8 @@
+out/
+target/
+repl/
+*.swp
+.lein*
+*~
+*.swo
+/thing1.js
