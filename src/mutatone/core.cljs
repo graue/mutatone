@@ -58,7 +58,7 @@
         octave (dec (Math/floor (/ note-num 12)))]
     (str (notenum->name num-in-octave) octave)))
 
-(defn midis->str
+(defn midiphrase->str
   [note-nums]
   (apply str
          (interpose " " (map midi->str note-nums))))
@@ -92,7 +92,8 @@
         chromatic-intervals (dia->chrom intervals scale)]
     (map (partial + octave-offset note-offset) chromatic-intervals)))
 
-(defn play-note-with-adsr [osc gain-node freq amp time length a d s r]
+(defn play-note-with-adsr [osc gain-node freq amp time length
+                           {:keys [a d s r]}]
   ;; Yes, this has way too many parameters. :|
   (.setValueAtTime (.-frequency osc) freq time)
   (.setValueAtTime (.-gain gain-node) 0 time)
@@ -101,18 +102,33 @@
   (.setValueAtTime (.-gain gain-node) s (+ time length (- r)))
   (.linearRampToValueAtTime (.-gain gain-node) 0 (+ time length)))
 
-(defn play-notes
-  [osc gain-node notes length]
-  (let [ctx (.-context osc)
-        current-time-fixme (hum/curr-time ctx)
-        start (+ 0.15 (hum/curr-time ctx))]
-    (dotimes [i (count notes)]
-      (let [note (nth notes i)
-            start (+ start (* i length))]
+(defn midiphrase->notes
+  "Converts a phrase specified as a seq of MIDI note numbers into a seq of
+  hashes with a :start and :freq. `length` is the time between notes."
+  [phrase length start-time]
+  (remove nil?
+    (for [i (range (count phrase))]
+      (let [note (nth phrase i)
+            start (+ start-time (* i length))]
+        (when note  ; Ignore nils, treating them as rests.
+          {:freq (midi->hz note)
+           :start start})))))
 
-        (when note  ; Ignore nil note values, treating them as rests.
-          (play-note-with-adsr osc gain-node (midi->hz note) 1.0
-                               start length 0.05 0.05 0.7 0.0625))))))
+(def default-adsr
+  {:a 0.05
+   :d 0.05
+   :s 0.7  ; about -3dB
+   :r 0.0625})
+
+(defn play-phrase
+  [osc gain-node phrase length]
+  (let [ctx (.-context osc)
+        start (+ 0.15 (hum/curr-time ctx))
+        raw-notes (midiphrase->notes phrase length start)]
+    (doseq [note raw-notes]
+      (play-note-with-adsr osc gain-node (:freq note) 1.0
+                           (:start note) length
+                           default-adsr))))
 
 (def ctx (atom nil))
 (def osc (atom nil))
