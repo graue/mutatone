@@ -51,8 +51,13 @@
 
 (defn play [idx]
   "Called when Play button clicked for melody at idx."
-  (.log js/console "play" idx)
-  )
+  (when-not (audio-inited?)
+    (init-audio))
+  (panic)  ; Kill any notes currently playing.
+  (let [melody (@melodies idx)
+        raw-notes (t/scalify (:intervals melody) (:scale melody)
+                             (:root melody) 4)]
+    (a/play-phrase @osc @gain raw-notes 0.75)))
 
 (defn init-page []
   (dom/render-melodies @melodies play breed))
