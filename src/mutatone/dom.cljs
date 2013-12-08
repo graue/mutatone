@@ -1,13 +1,16 @@
 (ns mutatone.dom
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy]
+            [dommy.attrs :refer [attr]]
+            [goog.events :as events]
             [mutatone.theory :refer [phrase->str scalify]])
   (:require-macros [dommy.macros :refer [node sel sel1 deftemplate]]))
 
 (deftemplate melody-template [melody idx]
   [:span
     [:button {:class "play-btn" :data-idx idx} "Play"]
-    [:button {:class "breed-btn" :data-idx idx} "Breed"]
+    [:button {:class "breed-btn" :data-idx idx :id (str "breed-btn-" idx)}
+             "Breed"]
     (phrase->str (scalify (:intervals melody)
                           (:scale melody)
                           (:root melody)))])
@@ -19,6 +22,10 @@
         [:li (melody-template (nth melodies i) i)])
     [:p "Then some more stuff"]]])
 
-(defn render-melodies [melodies]
+(defn render-melodies [melodies play-cb breed-cb]
   (dommy/replace! (sel1 :#melodies)
-                  (main-ui melodies)))
+                  (main-ui melodies))
+  (doseq [btn (sel :.play-btn)]
+    (events/listen btn "click" #(play-cb (attr btn "data-idx"))))
+  (doseq [btn (sel :.breed-btn)]
+    (events/listen btn "click" #(breed-cb (attr btn "data-idx")))))

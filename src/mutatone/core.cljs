@@ -44,8 +44,18 @@
       :scale "major"
       :root "d#"}]))
 
+(defn breed [idx]
+  "Called when Breed button clicked for melody at idx."
+  (.log js/console "breed" idx)
+  )
+
+(defn play [idx]
+  "Called when Play button clicked for melody at idx."
+  (.log js/console "play" idx)
+  )
+
 (defn init-page []
-  (dom/render-melodies @melodies))
+  (dom/render-melodies @melodies play breed))
 
 (defn on-load [cb]
   (if (#{"complete" "loaded" "interactive"} (.-readyState js/document))
