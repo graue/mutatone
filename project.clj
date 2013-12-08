@@ -1,6 +1,8 @@
 (defproject mutatone "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
+  :description "Generates melodies using evolutionary algorithms"
+  :url "https://github.com/graue/mutatone"
+  :license {:name "MIT License"
+            :url "https://github.com/graue/mutatone/blob/master/MIT-LICENSE.txt"}
 
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]
