@@ -79,7 +79,7 @@
 
 (defn on-load [cb]
   (if (#{"complete" "loaded" "interactive"} (.-readyState js/document))
-    (.setImmediate js/window cb)
+    (set-immediate cb)
     (.addEventListener js/document "DOMContentLoaded" init-page false)))
 
 (on-load init-page)
