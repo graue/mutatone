@@ -44,10 +44,19 @@
       :scale "major"
       :root "d#"}]))
 
-(defn breed [idx]
+(def breeders
+  (atom []))
+
+(defn breed! []
+  "This will be the hard part")
+
+(defn add-breeder [idx]
   "Called when Breed button clicked for melody at idx."
-  (.log js/console "breed" idx)
-  )
+  (when (< (count @breeders) 2)
+    (dom/disable-breed-button idx)
+    (swap! breeders conj (nth @melodies idx))
+    (when (= (count @breeders) 2)
+      (breed!))))
 
 (defn play [idx]
   "Called when Play button clicked for melody at idx."
@@ -60,7 +69,7 @@
     (a/play-phrase @osc @gain raw-notes 0.75)))
 
 (defn init-page []
-  (dom/render-melodies @melodies play breed))
+  (dom/render-melodies @melodies play add-breeders))
 
 (defn on-load [cb]
   (if (#{"complete" "loaded" "interactive"} (.-readyState js/document))

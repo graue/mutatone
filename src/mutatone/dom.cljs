@@ -1,7 +1,7 @@
 (ns mutatone.dom
   (:require [dommy.utils :as utils]
             [dommy.core :as dommy]
-            [dommy.attrs :refer [attr]]
+            [dommy.attrs :refer [attr set-attr!]]
             [goog.events :as events]
             [mutatone.theory :refer [phrase->str scalify]])
   (:require-macros [dommy.macros :refer [node sel sel1 deftemplate]]))
@@ -29,3 +29,6 @@
     (events/listen btn "click" #(play-cb (attr btn "data-idx"))))
   (doseq [btn (sel :.breed-btn)]
     (events/listen btn "click" #(breed-cb (attr btn "data-idx")))))
+
+(defn disable-breed-button [idx]
+  (set-attr! (sel1 (str "#breed-btn-" idx)) :disabled))
