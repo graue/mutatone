@@ -44,9 +44,39 @@
       :scale "major"
       :root "d#"}]))
 
-(defn possibly-mutate-intervals [x]
-  x ; not done
-  )
+;; function randomBetween(m, n)
+;;     -- Returns a pseudorandom real number in the range  m, n .
+;;     return math.random() * (n - m) + m
+;; end
+;; 
+;; function logRandomBetween(m, n)
+;;     -- Like `randomBetween()`, but for logarithmic quantities like
+;;     -- frequencies. The log of the return value will be equally
+;;     -- likely to lie at any point between log(m) and log(n).
+;;     return math.exp(randomBetween(math.log(m), math.log(n)))
+;; end
+
+(defn random-between
+  "Returns a pseudorandom real number in the range [m, n)."
+  [m n]
+  (+ m
+     (* (rand) (- n m))))
+
+(defn log-random-between
+  "Like random-between but for logarithmic quantities. Log of return value
+  will be equally distributed between log(m) and log(n)."
+  [m n]
+  (Math/exp (random-between (Math/log m) (Math/log n))))
+
+(defn possibly-mutate-number [x]
+  (let [make-negative? (= (rand-int 2) 0)
+        sign (if make-negative? -1 1)
+        sign (if (= (rand-int 3) 0) sign 0)
+        ]
+    (+ x (* sign (Math/round (- 3 (log-random-between 1 3)))))))
+
+(defn possibly-mutate-intervals [intervals]
+  (map possibly-mutate-number intervals))
 
 (defn mix-vectors [v1 v2]
   (.log js/console "mix vectors start")
