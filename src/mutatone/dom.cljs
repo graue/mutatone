@@ -11,9 +11,9 @@
     [:button {:class "play-btn" :data-idx idx} "Play"]
     [:button {:class "breed-btn" :data-idx idx :id (str "breed-btn-" idx)}
              "Breed"]
-    (phrase->str (scalify (:intervals melody)
-                          (:scale melody)
-                          (:root melody)))])
+    (str (:root melody) " " (:scale melody) ": "
+         (apply str
+                (interpose ", " (map str (:intervals melody)))))])
 
 (deftemplate main-ui [melodies]
   [:div#melodies

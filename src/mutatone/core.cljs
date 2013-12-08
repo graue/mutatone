@@ -72,12 +72,16 @@
 
 (declare play)
 (declare add-breeder)
+(declare set-immediate)
 
 (defn breed! []
   (.log js/console "breeding from breeders:" @breeders)
-  (when (= (count @breeders 2))
+  (when (= (count @breeders) 2)
     (reset! melodies
       [(breed-from (nth @breeders 0) (nth @breeders 1))
+       (breed-from (nth @breeders 0) (nth @breeders 1))
+       (breed-from (nth @breeders 0) (nth @breeders 1))
+       (breed-from (nth @breeders 0) (nth @breeders 1))
        (breed-from (nth @breeders 0) (nth @breeders 1))
        (breed-from (nth @breeders 0) (nth @breeders 1))])
     (reset! breeders [])
