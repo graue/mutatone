@@ -53,8 +53,7 @@
        (m/breed-from (nth @breeders 0) (nth @breeders 1))
        (m/breed-from (nth @breeders 0) (nth @breeders 1))])
     (reset! breeders [])
-    (set-immediate #(dom/render-melodies @melodies play add-breeder)))
-  )
+    (set-immediate #(dom/render-melodies @melodies play add-breeder))))
 
 (defn add-breeder [idx]
   "Called when Breed button clicked for melody at idx."
@@ -84,10 +83,4 @@
 
 (on-load init-page)
 
-(repl/connect "http://localhost:9000/repl")
-
-(comment
-  (play-notes @osc @gain
-              (t/scalify [0 0 1 1 3 2 -1 -1] "major pentatonic" "d#" 6)
-              0.75)
-  )
+#_(repl/connect "http://localhost:9000/repl")
