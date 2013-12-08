@@ -34,27 +34,15 @@
   (atom
     [{:intervals [0 0 1 1 3 2 -1 -1 0 0 1 1 3 2 -1 -1]
       :scale "phrygian"
-      :root "b"}
+      :root "B"}
 
      {:intervals [0 0 -1 -1 -2 -2 -3 -3 0 0 2 2 1 1 1 1]
       :scale "minor pentatonic"
-      :root "c"}
+      :root "C"}
 
      {:intervals [0 1 2 1 4 5 3 0 2 2 -1 -2 -1 -1 0 0 0 0 0 0]
       :scale "major"
-      :root "d#"}]))
-
-;; function randomBetween(m, n)
-;;     -- Returns a pseudorandom real number in the range  m, n .
-;;     return math.random() * (n - m) + m
-;; end
-;; 
-;; function logRandomBetween(m, n)
-;;     -- Like `randomBetween()`, but for logarithmic quantities like
-;;     -- frequencies. The log of the return value will be equally
-;;     -- likely to lie at any point between log(m) and log(n).
-;;     return math.exp(randomBetween(math.log(m), math.log(n)))
-;; end
+      :root "D#"}]))
 
 (defn random-between
   "Returns a pseudorandom real number in the range [m, n)."
@@ -68,12 +56,16 @@
   [m n]
   (Math/exp (random-between (Math/log m) (Math/log n))))
 
+(defn random-from [seq]
+  (let [idx (rand-int (count seq))]
+    (nth seq idx)))
+
 (defn possibly-mutate-number [x]
   (let [make-negative? (= (rand-int 2) 0)
         sign (if make-negative? -1 1)
         sign (if (= (rand-int 3) 0) sign 0)
         ]
-    (+ x (* sign (Math/round (- 3 (log-random-between 1 3)))))))
+    (+ x (* sign (Math/round (- 2 (log-random-between 1 2)))))))
 
 (defn possibly-mutate-intervals [intervals]
   (map possibly-mutate-number intervals))
@@ -90,12 +82,16 @@
 (defn breed-from [m1 m2]
   {:intervals (possibly-mutate-intervals
                 (mix-vectors (:intervals m1) (:intervals m2)))
-   :scale (if (= 0 (rand-int 2))
-            (:scale m1)
-            (:scale m2))
-   :root (if (= 0 (rand-int 2))
-           (:root m1)
-           (:root m2))})
+   :scale (if (= 0 (rand-int 5))
+            (random-from (keys t/scales))
+            (if (= 0 (rand-int 2))
+              (:scale m1)
+              (:scale m2)))
+   :root (if (= 0 (rand-int 5))
+           (random-from (keys t/notes))
+           (if (= 0 (rand-int 2))
+            (:root m1)
+            (:root m2)))})
 
 (def breeders
   (atom []))
