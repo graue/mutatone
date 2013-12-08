@@ -16,7 +16,7 @@
                           (:root melody)))])
 
 (deftemplate main-ui [melodies]
-  [:div
+  [:div#melodies
     [:ul
       (for [i (range (count melodies))]
         [:li (melody-template (nth melodies i) i)])
