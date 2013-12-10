@@ -3,7 +3,8 @@
             [dommy.core :as dommy]
             [dommy.attrs :refer [attr set-attr!]]
             [goog.events :as events]
-            [mutatone.theory :refer [phrase->str scalify]])
+            [mutatone.theory :refer [phrase->str scalify]]
+            [mutatone.utils :refer [flat-str]])
   (:require-macros [dommy.macros :refer [node sel sel1 deftemplate]]))
 
 (deftemplate melody-template [melody idx]
@@ -11,9 +12,8 @@
     [:button {:class "play-btn" :data-idx idx} "Play"]
     [:button {:class "breed-btn" :data-idx idx :id (str "breed-btn-" idx)}
              "Breed"]
-    (str (:root melody) " " (:scale melody) ": "
-         (apply str
-                (interpose ", " (map str (:intervals melody)))))])
+    (flat-str (:root melody) " " (:scale melody) ": "
+              (interpose ", " (:intervals melody)))])
 
 (deftemplate main-ui [melodies]
   [:div#melodies
