@@ -1,12 +1,10 @@
 (ns mutatone.theory
+  "'Music theory', or in other words, utility functions that have nothing to
+  do with audio output (they only manipulate values)."
   (:require [clojure.set :as cset]))
-
-;;; "Music theory", or in other words, utility functions that have nothing to
-;;; do with audio output (they only manipulate values).
 
 (defn midi->hz
   "Convert a MIDI note number to its frequency in Hz."
-  ; freq = 440 * pow(2.0, (note - 69) / 12.0);
   [note-num]
   (* 440 (Math/pow 2.0
                    (/ (- note-num 69) 12.0))))
@@ -61,7 +59,7 @@
   [note-nums]
   (apply str
          (interpose " " (map midi->str note-nums))))
- 
+
 (defn dia->chrom
   "Convert diatonic intervals (relative to scale root = 0, *not* each other)
   to chromatic intervals (again relative to the scale root), for the given
@@ -96,9 +94,9 @@
   hashes with a :start and :freq. `length` is the time between notes."
   [phrase length start-time]
   (remove nil?
-    (for [i (range (count phrase))]
-      (let [note (nth phrase i)
-            start (+ start-time (* i length))]
-        (when note  ; Ignore nils, treating them as rests.
-          {:freq (midi->hz note)
-           :start start})))))
+          (for [i (range (count phrase))]
+            (let [note (nth phrase i)
+                  start (+ start-time (* i length))]
+              (when note  ; Ignore nils, treating them as rests.
+                {:freq (midi->hz note)
+                 :start start})))))

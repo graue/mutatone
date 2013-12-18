@@ -19,8 +19,7 @@
   [:div#melodies
     [:ul
       (for [i (range (count melodies))]
-        [:li (melody-template (nth melodies i) i)])
-    ]])
+        [:li (melody-template (nth melodies i) i)])]])
 
 (defn render-melodies [melodies play-cb breed-cb]
   (dommy/replace! (sel1 :#melodies)

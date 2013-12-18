@@ -1,7 +1,8 @@
 (ns mutatone.melodies
-  (:require [mutatone.theory :as t]))
+  "Melodies and breeding."
+  (:require [mutatone.theory :as t]
+            [mutatone.utils :refer [random-between log-random-between]]))
 
-;;; Melodies and breeding.
 (def seed-melodies
   [{:intervals [0 0 1 1 3 2 -1 -1 0 0 1 1 3 2 -1 -1]
     :scale "phrygian"
@@ -14,22 +15,6 @@
    {:intervals [0 1 2 1 4 5 3 0 2 2 -1 -2 -1 -1 0 0 0 0 0 0]
     :scale "major"
     :root "D#"}])
-
-(defn random-between
-  "Returns a pseudorandom real number in the range [m, n)."
-  [m n]
-  (+ m
-     (* (rand) (- n m))))
-
-(defn log-random-between
-  "Like random-between but for logarithmic quantities. Log of return value
-  will be equally distributed between log(m) and log(n)."
-  [m n]
-  (Math/exp (random-between (Math/log m) (Math/log n))))
-
-(defn random-from [seq]
-  (let [idx (rand-int (count seq))]
-    (nth seq idx)))
 
 (defn possibly-mutate-number [x]
   (let [make-negative? (= (rand-int 2) 0)
@@ -52,12 +37,12 @@
   {:intervals (possibly-mutate-intervals
                 (mix-vectors (:intervals m1) (:intervals m2)))
    :scale (if (= 0 (rand-int 5))
-            (random-from (keys t/scales))
+            (rand-nth (keys t/scales))
             (if (= 0 (rand-int 2))
               (:scale m1)
               (:scale m2)))
    :root (if (= 0 (rand-int 5))
-           (random-from (keys t/notes))
+           (rand-nth (keys t/notes))
            (if (= 0 (rand-int 2))
             (:root m1)
             (:root m2)))})
