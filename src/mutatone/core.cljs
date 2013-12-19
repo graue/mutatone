@@ -46,12 +46,12 @@
 (defn breed! []
   (when (= (count @breeders) 2)
     (reset! melodies
-      [(m/breed-from (nth @breeders 0) (nth @breeders 1))
-       (m/breed-from (nth @breeders 0) (nth @breeders 1))
-       (m/breed-from (nth @breeders 0) (nth @breeders 1))
-       (m/breed-from (nth @breeders 0) (nth @breeders 1))
-       (m/breed-from (nth @breeders 0) (nth @breeders 1))
-       (m/breed-from (nth @breeders 0) (nth @breeders 1))])
+      ;; Careful - without the `vec`, this won't work. `for` yields a lazy
+      ;; sequence, which otherwise won't be evaluated until after @breeders
+      ;; is reset to an empty vector.
+      (vec
+        (for [_ (range 6)]
+          (m/breed-from (nth @breeders 0) (nth @breeders 1)))))
     (reset! breeders [])
     (set-immediate #(dom/render-melodies @melodies play add-breeder))))
 
