@@ -1,7 +1,11 @@
-(ns mutatone.utils)
+(ns mutatone.utils
+  (:import [goog.ui IdGenerator]))
 
 (defn flat-str [& args]
   (apply str (flatten args)))
+
+(defn guid []
+  (.getNextUniqueId (.getInstance IdGenerator)))
 
 (defn random-between
   "Returns a pseudorandom real number in the range [m, n)."

@@ -1,11 +1,25 @@
 (ns mutatone.dom
-  (:require [dommy.utils :as utils]
+  (:require [om.core :as om :include-macros true]
+            [sablono.core :refer [html] :include-macros true]
+            [dommy.utils :as utils]
             [dommy.core :as dommy]
             [dommy.attrs :refer [attr set-attr!]]
             [goog.events :as events]
             [mutatone.theory :refer [phrase->str scalify]]
             [mutatone.utils :refer [flat-str]])
   (:require-macros [dommy.macros :refer [node sel sel1 deftemplate]]))
+
+(defn melody-widget
+  [{:keys [root scale intervals will-breed] :as melody}
+   {:keys [comm]}]
+  (om/component
+    (html [:span
+            [:button {:className "play-btn"} "Play"]
+            [:button {:className "breed-btn"
+                      :disabled (if will-breed "true" "false")}
+                     "Breed"]
+            (flat-str root " " scale ": "
+                      (interpose ", " intervals))])))
 
 (deftemplate melody-template [melody idx]
   [:span
