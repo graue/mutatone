@@ -36,7 +36,7 @@
 
 (def app-state
   (atom
-    (with-id {:melodies (vec (map with-id m/seed-melodies))})))
+    (with-id {:melodies (mapv with-id m/seed-melodies)})))
 
 (defn breed-new-batch [p1 p2]
   "Breeds a new batch of melodies from the given parents."
@@ -59,19 +59,12 @@
 
 (defmethod handle-event :breed [app [_ melody]]
   (om/update! melody #(assoc % :will-breed true))
-  (let [breeders (filter :will-breed (om/get-state app [:melodies]))]
-    (.log js/console "The breeders are:" (str breeders))
-    (when (= (count breeders) 2)
-      (om/update! app [:melodies]
-                  (->> breeders
-                       (apply breed-new-batch)
-                       (map with-id)
-                       vec
-                       constantly)))))
-
-(defmethod handle-event :default [_ [ev-type id]]
-  (.log js/console "An event of unknown type" (name ev-type) "occurred,"
-        "respecting element with id" id))  ; FIXME
+  (om/update! app [:melodies]
+    (fn [melodies]
+      (let [breeders (filter :will-breed melodies)]
+        (if (= (count breeders) 2)
+          (apply breed-new-batch breeders)
+          melodies)))))
 
 (defn app-methods [{:keys [melodies] :as app}]
   (reify
