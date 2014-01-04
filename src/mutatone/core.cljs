@@ -58,27 +58,26 @@
   (play melody))
 
 (defmethod handle-event :breed [app [_ melody]]
-  (om/update! melody #(assoc % :will-breed true))
-  (om/update! app [:melodies]
+  (om/transact! melody #(assoc % :will-breed true))
+  (om/transact! app [:melodies]
     (fn [melodies]
       (let [breeders (filter :will-breed melodies)]
         (if (= (count breeders) 2)
           (apply breed-new-batch breeders)
           melodies)))))
 
-(defn app-methods [{:keys [melodies] :as app}]
+(defn app-methods [{:keys [melodies] :as app} owner]
   (reify
     om/IWillMount
-    (will-mount [_ owner]
+    (will-mount [_]
       (let [comm (chan)]
-        (om/set-state! owner [:comm] comm)
+        (om/set-state! owner :comm comm)
         (go (while true
               (handle-event app (<! comm))))))
 
     om/IRender
-    (render [_ owner]
-      (om/build dom/melody-list-widget app
-                {:opts {:comm (om/get-state owner [:comm])}
-                 :path [:melodies]}))))
+    (render [_]
+      (om/build dom/melody-list-widget melodies
+                {:opts {:comm (om/get-state owner :comm)}}))))
 
 (om/root app-state app-methods (.getElementById js/document "melodies"))

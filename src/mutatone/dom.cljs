@@ -8,11 +8,13 @@
 
 (defn melody-widget
   [{:keys [id root scale intervals will-breed] :as melody}
+   owner
    {:keys [comm]}]
   (om/component
-    (html [:span
+    (html [:li
             [:button {:className "play-btn"
-                      :onClick #(put! comm [:play melody])}
+                      :onClick (let [value (om/value melody)]
+                                 #(put! comm [:play value]))}
              "Play"]
             [:button {:className "breed-btn"
                       :disabled (if will-breed "true" "")
@@ -22,11 +24,9 @@
                       (interpose ", " intervals))])))
 
 (defn melody-list-widget
-  [melodies {:keys [comm]}]
+  [melodies owner {:keys [comm]}]
   (om/component
     (html
       [:ul
-        (map (fn [idx]
-               [:li (om/build melody-widget melodies
-                              {:opts {:comm comm}, :path [idx]})])
-             (range (count melodies)))])))
+        (om/build-all melody-widget melodies
+                      {:opts {:comm comm}})])))
