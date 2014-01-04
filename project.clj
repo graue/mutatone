@@ -8,8 +8,8 @@
                  [org.clojure/clojurescript "0.0-2138"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [hum "0.2.4"]
-                 [om "0.1.0-SNAPSHOT"]
-                 [sablono "0.1.3"]]
+                 [om "0.1.3"]
+                 [sablono "0.1.5"]]
 
   :plugins [[lein-cljsbuild "1.0.0"]]
 
