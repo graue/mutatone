@@ -57,8 +57,8 @@
 (defmethod handle-event :play [app [_ melody]]
   (play melody))
 
-(defmethod handle-event :breed [app [_ melody]]
-  (om/transact! melody #(assoc % :will-breed true))
+(defmethod handle-event :breed [app [_ melody-cursor]]
+  (om/transact! melody-cursor #(assoc % :will-breed true))
   (om/transact! app [:melodies]
     (fn [melodies]
       (let [breeders (filter :will-breed melodies)]
