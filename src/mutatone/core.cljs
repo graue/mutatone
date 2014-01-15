@@ -1,10 +1,13 @@
 (ns mutatone.core
-  (:require [clojure.browser.repl :as repl]
-            [mutatone.theory :as t]
+  (:require [mutatone.theory :as t]
             [mutatone.audio :as a]
             [hum.core :as hum]
             [mutatone.dom :as dom]
-            [mutatone.melodies :as m]))
+            [cljs.core.async :refer [<! chan]]
+            [om.core :as om :include-macros true]
+            [mutatone.melodies :as m]
+            [mutatone.utils :refer [with-id]])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def ctx (atom nil))
 (def osc (atom nil))
@@ -31,56 +34,50 @@
 (defn panic []
   (a/kill-notes @osc @gain))
 
-(def melodies
-  (atom m/seed-melodies))
+(def app-state
+  (atom
+    (with-id {:melodies (mapv with-id m/seed-melodies)})))
 
-(def breeders
-  (atom []))
+(defn breed-new-batch [p1 p2]
+  "Breeds a new batch of melodies from the given parents."
+  (vec (for [_ (range 6)]
+         (m/breed-from p1 p2))))
 
-(declare play)
-(declare add-breeder)
-
-(defn set-immediate [func]
-  (.setTimeout js/window func 0))
-
-(defn breed! []
-  (when (= (count @breeders) 2)
-    (reset! melodies
-      ;; Careful - without the `vec`, this won't work. `for` yields a lazy
-      ;; sequence, which otherwise won't be evaluated until after @breeders
-      ;; is reset to an empty vector.
-      (vec
-        (for [_ (range 6)]
-          (m/breed-from (nth @breeders 0) (nth @breeders 1)))))
-    (reset! breeders [])
-    (set-immediate #(dom/render-melodies @melodies play add-breeder))))
-
-(defn add-breeder [idx]
-  "Called when Breed button clicked for melody at idx."
-  (when (< (count @breeders) 2)
-    (dom/disable-breed-button idx)
-    (swap! breeders conj (nth @melodies idx))
-    (when (= (count @breeders) 2)
-      (set-immediate breed!))))
-
-(defn play [idx]
-  "Called when Play button clicked for melody at idx."
+(defn play [melody]
   (when-not (audio-inited?)
     (init-audio))
   (panic)  ; Kill any notes currently playing.
-  (let [melody (@melodies idx)
-        raw-notes (t/scalify (:intervals melody) (:scale melody)
+  (let [raw-notes (t/scalify (:intervals melody) (:scale melody)
                              (:root melody) 4)]
     (a/play-phrase @osc @gain raw-notes 0.75)))
 
-(defn init-page []
-  (dom/render-melodies @melodies play add-breeder))
+(defmulti handle-event
+  (fn [_ [ev-type _]] ev-type))
 
-(defn on-load [cb]
-  (if (#{"complete" "loaded" "interactive"} (.-readyState js/document))
-    (set-immediate cb)
-    (.addEventListener js/document "DOMContentLoaded" init-page false)))
+(defmethod handle-event :play [app [_ melody]]
+  (play melody))
 
-(on-load init-page)
+(defmethod handle-event :breed [app [_ melody-cursor]]
+  (om/transact! melody-cursor #(assoc % :will-breed true))
+  (om/transact! app [:melodies]
+    (fn [melodies]
+      (let [breeders (filter :will-breed melodies)]
+        (if (= (count breeders) 2)
+          (apply breed-new-batch breeders)
+          melodies)))))
 
-#_(repl/connect "http://localhost:9000/repl")
+(defn app-methods [{:keys [melodies] :as app} owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [comm (chan)]
+        (om/set-state! owner :comm comm)
+        (go (while true
+              (handle-event app (<! comm))))))
+
+    om/IRender
+    (render [_]
+      (om/build dom/melody-list-widget melodies
+                {:opts {:comm (om/get-state owner :comm)}}))))
+
+(om/root app-state app-methods (.getElementById js/document "melodies"))
