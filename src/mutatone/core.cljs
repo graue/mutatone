@@ -27,8 +27,8 @@
   (reset! gain (hum/create-gain @ctx))
   (hum/connect @osc @filt)
   (hum/connect @filt @gain)
-  (hum/start-osc @ctx @osc)
-  (hum/connect-output @ctx @gain)
+  (hum/start-osc @osc)
+  (hum/connect-output @gain)
   nil)
 
 (defn panic []
@@ -80,4 +80,5 @@
       (om/build dom/melody-list-widget melodies
                 {:opts {:comm (om/get-state owner :comm)}}))))
 
-(om/root app-state app-methods (.getElementById js/document "melodies"))
+(om/root app-methods app-state
+         {:target (.getElementById js/document "melodies")})

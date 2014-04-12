@@ -1,6 +1,6 @@
 (ns mutatone.dom
   (:require [om.core :as om :include-macros true]
-            [sablono.core :refer [html] :include-macros true]
+            [sablono.core :refer-macros [html]]
             [goog.events :as events]
             [cljs.core.async :refer [put!]]
             [mutatone.theory :refer [phrase->str scalify]]
